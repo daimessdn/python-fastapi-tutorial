@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Path
+from typing import Optional
 
 # init FastAPI instance
 app = FastAPI()
@@ -35,3 +36,12 @@ def get_user(user_id: int):
 @app.get("/users-2/{user_id}")
 def get_user_2(user_id: int = Path(description="ID of user for wiewing user details.", gt=0, lt=4)):
     return users[user_id]
+
+# Working in queries
+@app.get("/users-3")
+def get_user_3(*, name: Optional[str] = None, test: int = None):
+    for user_id in users:
+        if users[user_id]["name"] == name:
+            return { "user": users[user_id], "test": test }
+        
+    return { "response": "404 not found" }
