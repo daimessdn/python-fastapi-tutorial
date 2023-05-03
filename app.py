@@ -7,6 +7,11 @@ class User(BaseModel):
     age: int
     email: Optional[str] = None
 
+class UpdateUser(BaseModel):
+    name: Optional[str] = None
+    age: Optional[int] = None
+    email: Optional[str] = None
+
 # init FastAPI instance
 app = FastAPI()
 
@@ -22,11 +27,7 @@ def about():
     return {"response": "about"}
 
 # Working with parameters
-users = {
-    1: {"name": "Bambang", "age": 20},
-    2: {"name": "Sarah", "age": 18},
-    3: {"name": "Surtiyem", "age": 13},
-}
+users = {}
 
 @app.get("/users/{user_id}")
 def get_user(user_id: int):
@@ -59,4 +60,21 @@ def create_user(*, user_id: int = len(users) + 1, user: User):
         "age": user.age,
         "email": user.email
     }
+    return users[user_id]
+
+# working with PUT method
+@app.put("/users/{user_id}")
+def update_user(user_id: int, user: UpdateUser):
+    if user_id not in users:
+        return { "error": "user no exists" }
+    
+    if user.name != None:
+        users[user_id].name = user.name
+
+    if user.age != None:
+        users[user_id].age = user.age
+
+    if user.email != None:
+        users[user_id].email = user.email
+
     return users[user_id]
