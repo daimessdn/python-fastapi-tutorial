@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Path
 
 # init FastAPI instance
 app = FastAPI()
@@ -21,4 +21,11 @@ users = {
 
 @app.get("/users/{user_id}")
 def get_user(user_id: int):
+    return users[user_id]
+
+# Using Path method in FastAPI
+## Import Path first from fastapi module
+
+@app.get("/users-2/{user_id}")
+def get_user_2(user_id: int = Path(description="ID of user for wiewing user details.")):
     return users[user_id]
