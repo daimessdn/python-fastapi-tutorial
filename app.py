@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, Query
+from fastapi import FastAPI, Path, Query, HTTPException, status
 from typing import Optional
 from pydantic import BaseModel
 
@@ -46,14 +46,14 @@ def get_user_3(*, name: Optional[str] = None, test: int = None):
     for user_id in users:
         if users[user_id]["name"] == name:
             return { "user": users[user_id], "test": test }
-        
-    return { "response": "404 not found" }
+    
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user ID not found")
 
 # working with POST method
 @app.post("/users/{user_id}")
 def create_user(*, user_id: int = len(users) + 1, user: User):
     if user_id in users:
-        return { "error": "user already exists" }
+        raise HTTPException(status_code=status.HTTP_400, detail="user already exists")
     
     users[user_id] = {
         "name": user.name,
@@ -66,7 +66,7 @@ def create_user(*, user_id: int = len(users) + 1, user: User):
 @app.put("/users/{user_id}")
 def update_user(user_id: int, user: UpdateUser):
     if user_id not in users:
-        return { "error": "user no exists" }
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not exists")
     
     if user.name != None:
         users[user_id].name = user.name
@@ -83,7 +83,7 @@ def update_user(user_id: int, user: UpdateUser):
 @app.delete("/users/")
 def delete_user(user_id: int = Query(..., description="The ID of user desired to be deleted")):
     if user_id not in users:
-        return { "error": "user no exists" }
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not exists")
     
     del users[user_id]
     return { "response": "user deleted" }
