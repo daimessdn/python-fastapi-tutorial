@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path
+from fastapi import FastAPI, Path, Query
 from typing import Optional
 from pydantic import BaseModel
 
@@ -78,3 +78,12 @@ def update_user(user_id: int, user: UpdateUser):
         users[user_id].email = user.email
 
     return users[user_id]
+
+# working with DELETE method
+@app.delete("/users/")
+def delete_user(user_id: int = Query(..., description="The ID of user desired to be deleted")):
+    if user_id not in users:
+        return { "error": "user no exists" }
+    
+    del users[user_id]
+    return { "response": "user deleted" }
